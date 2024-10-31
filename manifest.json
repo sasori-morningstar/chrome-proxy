@@ -1,0 +1,17 @@
+{
+    "manifest_version": 3,
+    "name": "Chrome's proxy",
+    "version": "1.0",
+    "permissions": [
+        "contextMenus",
+        "proxy",
+        "storage",
+        "notifications"
+    ],
+    "background": {
+        "service_worker": "background.js"
+    },
+    "icons": {
+        "48": "icon48.png"
+    }
+}
