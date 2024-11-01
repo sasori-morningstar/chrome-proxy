@@ -6,7 +6,12 @@
         "contextMenus",
         "proxy",
         "storage",
-        "notifications"
+        "notifications",
+        "webRequest",
+        "webRequestAuthProvider"
+    ],
+    "host_permissions": [
+        "<all_urls>"
     ],
     "background": {
         "service_worker": "background.js"

@@ -28,10 +28,9 @@ function setProxy(proxyConfig){
     )
 }
 
+
 chrome.contextMenus.onClicked.addListener((info, tab)=>{
     if(info.menuItemId==="setProxy"){
-        const username = "package-10001-country-fr-sessionid-01k4ahfe-sessionlength-3600"
-        const password = "AcpVQtYstcLT4Q7d"
         const proxyConfig = {
             mode: "fixed_servers",
             rules: {
@@ -44,18 +43,36 @@ chrome.contextMenus.onClicked.addListener((info, tab)=>{
             }
         }
         setProxy(proxyConfig)
-        if(username != "" || password != ""){
-            chrome.runtime.onMessage.addListener((request, sender, sendResponse)=>{
-                if(request.type === "authRequired"){
-                    sendResponse({
-                        authCredentials: {
-                            username: username,
-                            password: password
-                        }
-                    })
-                }
-            })
-        }
         showNotification("Chrome's Proxy", `Proxy set to  ${proxyConfig.rules.singleProxy.host}:${proxyConfig.rules.singleProxy.port}`)
     }
 })
+/*chrome.runtime.onMessage.addListener((request, sender, sendResponse)=>{
+    if(request.type === "authRequired"){
+        const username = "package-10001-country-fr-sessionid-01k4ahfe-sessionlength-3600"
+        const password = "AcpVQtYstcLT4Q7d"
+        sendResponse({
+            authCredentials: {
+                username: username,
+                password: password
+            }
+        })
+    }
+})*/
+const username = "package-10001-country-fr-sessionid-01k4ahfe-sessionlength-3600"
+const password = "AcpVQtYstcLT4Q7d"
+chrome.webRequest.onAuthRequired.addListener(
+    function(details) {
+        return {
+            authCredentials: {
+                username: username,
+                password: password
+            }
+        };
+    },
+    { urls: ["<all_urls>"] },
+    ["blocking"]
+);
+chrome.proxy.onProxyError.addListener((error)=>{
+        console.log(error)
+    }
+)
