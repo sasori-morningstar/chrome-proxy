@@ -15,6 +15,16 @@ chrome.runtime.onInstalled.addListener(() => {
         title: "Set Proxy",
         contexts: ["action"]
     })
+    chrome.contextMenus.create({
+        id: "setProxy2",
+        title: "Set Proxy 02",
+        contexts: ["action"]
+    })
+    chrome.contextMenus.create({
+        id: "disableProxy",
+        title: "Disable Proxy",
+        contexts: ["action"]
+    })
 })
 
 function setProxy(proxyConfig){
@@ -23,15 +33,38 @@ function setProxy(proxyConfig){
             value: proxyConfig,
             scope: "regular"
         }, function() {
-            console.log("Proxy set:", proxyConfig)
+            if (chrome.runtime.lastError) {
+                console.log("Error setting proxy:", chrome.runtime.lastError);
+                showNotification("Error", "Failed to set proxy.");
+            } else {
+                console.log("Proxy set:", proxyConfig);
+            }
         }
     )
 }
+/*function saveCredentials(proxyUser, proxyPass) {
+    chrome.storage.local.set({ proxyUser, proxyPass }, function() {
+        console.log("Credentials saved.");
+    });
+}
+function getCredentials(callback) {
+    chrome.storage.local.get(["proxyUser", "proxyPass"], function(result) {
+        if (chrome.runtime.lastError) {
+            console.log("Error retrieving credentials:", chrome.runtime.lastError);
+            callback(null, null); 
+        } else {
+            callback(result.proxyUser, result.proxyPass);
+        }
+    });
+}*/
 
 
+let username=null
+let password=null
 chrome.contextMenus.onClicked.addListener((info, tab)=>{
+    let proxyConfig;
     if(info.menuItemId==="setProxy"){
-        const proxyConfig = {
+        proxyConfig = {
             mode: "fixed_servers",
             rules: {
                 singleProxy: {
@@ -42,32 +75,53 @@ chrome.contextMenus.onClicked.addListener((info, tab)=>{
                 bypassList: ["localhost"]
             }
         }
+        password="package-10001-country-fr-sessionid-01k4ahfe-sessionlength-3600"
+        username="AcpVQtYstcLT4Q7d"
+        //saveCredentials("package-10001-country-fr-sessionid-01k4ahfe-sessionlength-3600", "AcpVQtYstcLT4Q7d")
         setProxy(proxyConfig)
         showNotification("Chrome's Proxy", `Proxy set to  ${proxyConfig.rules.singleProxy.host}:${proxyConfig.rules.singleProxy.port}`)
+    }else if(info.menuItemId==="setProxy2"){
+        proxyConfig = {
+            mode: "fixed_servers",
+            rules: {
+                singleProxy: {
+                    scheme: "http",
+                    host: "rotating.proxyempire.io",
+                    port: 9009,
+                },
+                bypassList: ["localhost"]
+            }
+        }
+        password="wifi;gb;;;"
+        username="AcpVQtYstcLT4Q7d"
+        //saveCredentials("wifi;gb;;;", "AcpVQtYstcLT4Q7d")
+        setProxy(proxyConfig)
+        showNotification("Chrome's Proxy", `Proxy set to  ${proxyConfig.rules.singleProxy.host}:${proxyConfig.rules.singleProxy.port}`)
+    }else if(info.menuItemId==="disableProxy"){
+        username=null
+        password=null
+        //saveCredentials(null, null)
+        proxyConfig = {
+            mode: "direct"
+        }
+        setProxy(proxyConfig)
+        showNotification("Chrome's Proxy", "Proxy disabled")
     }
 })
-/*chrome.runtime.onMessage.addListener((request, sender, sendResponse)=>{
-    if(request.type === "authRequired"){
-        const username = "package-10001-country-fr-sessionid-01k4ahfe-sessionlength-3600"
-        const password = "AcpVQtYstcLT4Q7d"
-        sendResponse({
-            authCredentials: {
-                username: username,
-                password: password
-            }
-        })
-    }
-})*/
-const username = "package-10001-country-fr-sessionid-01k4ahfe-sessionlength-3600"
-const password = "AcpVQtYstcLT4Q7d"
+
 chrome.webRequest.onAuthRequired.addListener(
     function(details) {
-        return {
-            authCredentials: {
-                username: username,
-                password: password
-            }
-        };
+        if(username&&password){
+            return {
+                authCredentials: {
+                    username: username,
+                    password: password
+                }
+            };
+        }else{
+             console.log("No credentials found.")
+             return {}
+        }
     },
     { urls: ["<all_urls>"] },
     ["blocking"]
