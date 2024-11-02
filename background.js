@@ -70,12 +70,14 @@ chrome.contextMenus.onClicked.addListener((info, tab)=>{
                 singleProxy: {
                     scheme: "http",
                     host: "rotating.proxyempire.io",
-                    port: 5000
+                    port: 9004
                 },
                 bypassList: ["localhost"]
             }
         }
-        password="package-10001-country-fr-sessionid-01k4ahfe-sessionlength-3600"
+        /*password="package-10001-country-fr-sessionid-01k4ahfe-sessionlength-3600"
+        username="AcpVQtYstcLT4Q7d"*/
+        password="wifi;ca;;;"
         username="AcpVQtYstcLT4Q7d"
         //saveCredentials("package-10001-country-fr-sessionid-01k4ahfe-sessionlength-3600", "AcpVQtYstcLT4Q7d")
         setProxy(proxyConfig)
